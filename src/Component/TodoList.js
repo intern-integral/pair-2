@@ -1,11 +1,11 @@
 import React from "react";
 
-const TodoList = ({ todos, handleDelete }) => {
+const TodoList = ({ todos, handleDelete , settingTodoEdit}) => {
   return (
     <ul>
       {todos.map((todo) => {
         return (
-          <li key={todo.id} className="todos">
+          <li key={todo._id} className="todos">
             <h3>{todo.title}</h3>
             <p>{todo.description}</p>
             <button
@@ -13,6 +13,12 @@ const TodoList = ({ todos, handleDelete }) => {
               onClick={() => handleDelete(todo.id)}
             >
               Delete
+            </button>
+            <button
+              className="btn-select"
+              onClick={() => settingTodoEdit(todo)}
+            >
+              Select
             </button>
           </li>
         );

@@ -1,33 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TodoList from "./TodoList";
 import TodoForm from "./TodoForm";
-import data from "./data.js";
+import {getTodos, postTodo, editTodo} from "../services/TodoServices"
 
 const TodoPage = () => {
-  const [todos, setTodos] = useState(data);
+  const [todos, setTodos] = useState([]);
+  const [isRefetch, setIsRefetch] = useState(true);
+  const [todoEdit, setTodoEdit] = useState({});
   
   const handleDelete = (deleteId) => {
     const newTodos = todos.filter((todo) => todo.id !== deleteId);
     setTodos(newTodos);
   };
 
-  const handleAdd = (title, description) => {
-    const lastIndex = todos.length;
-    const todo = {
-      id: lastIndex + 1,
-      title,
-      description,
+  const fetchingData = async () => {
+    try {
+      const { data: { data }, } = await getTodos();
+      setTodos(data);
+      setIsRefetch(false);
+    } catch (error) {
+      console.log(error);
     }
-    console.log(title); 
-    console.log(description);
-    setTodos([...todos, todo])
-   
+  }
+  useEffect(() => {
+    if(isRefetch){
+      fetchingData();
+    }
+  }, [isRefetch])
+
+  const handleAdd = async (title, description) => {
+    const body = {
+      title, description
+    }
+    try {
+      await postTodo(body);
+      setIsRefetch(true);
+    } catch (error) {
+      console.log(error)
+    }
   } 
+
+  const handleEdit = async (id, title, description) => {
+    const editedTodo = {
+      title, description
+    }
+    try {
+      await editTodo(id, editedTodo);
+      setIsRefetch(true);
+      setTodoEdit({})
+    } catch(error){
+      console.log(error)
+    }
+  } 
+
   return (
     <div>
       <h1>Todo List</h1>
-      <TodoForm handleAdd={handleAdd}/>
-      <TodoList todos={todos} handleDelete={handleDelete} />
+      <TodoForm handleAdd={handleAdd} todoEdit={todoEdit} handleEdit={handleEdit}/>
+      <TodoList todos={todos} handleDelete={handleDelete} settingTodoEdit={setTodoEdit} />
     </div>
   );
 };

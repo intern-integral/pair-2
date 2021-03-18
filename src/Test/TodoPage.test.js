@@ -1,81 +1,108 @@
 import React from "react";
 import { mount, shallow } from "enzyme";
 import TodoPage from "../Component/TodoPage.js";
+import {getTodos, postTodo, editTodo} from "../services/TodoServices";
+import { act } from 'react-dom/test-utils';
+jest.mock("axios");
+jest.mock("../services/TodoServices", () => ({
+  getTodos: jest.fn(),
+  postTodo : jest.fn(),
+  editTodo : jest.fn()
+}));
 
 describe("TodoPages", () => {
+  
   describe("#render", () => {
-    it("should render a header and a Todolist component", () => {
+    it("should render a header, a Todolist component, and a TodoForm component", () => {
       const wrapper = shallow(<TodoPage />);
 
       const todoPageHeader = wrapper.find("h1");
       const todoList = wrapper.find("TodoList");
+      const todoForm = wrapper.find("TodoForm");
 
       expect(todoPageHeader).toHaveLength(1);
       expect(todoList).toHaveLength(1);
-    });
-
-    it("should render a label, input, and button for adding todos", () => {
-      const wrapper = shallow(<TodoPage />);
-
-      const addLabel = wrapper.find('.addLabel');
-      const addInputTitle = wrapper.find('.addInput-title');
-      const addInputDesc = wrapper.find('.addInput-desc');
-      const btn_add = wrapper.find('.btn_add');
-
-      expect(addLabel).toHaveLength(1);
-      expect(addInputTitle).toHaveLength(1);
-      expect(addInputDesc).toHaveLength(1);
-      expect(btn_add).toHaveLength(1);
-    })
+      expect(todoForm).toHaveLength(1);
+    }); 
+    
   });
-
-  describe('#handleAdd', () => {
-    it('should add a new todo when the handleAdd is invoked', async () => {
-      const wrapper = shallow(<TodoPage />);
-      const todoForm = wrapper.find('TodoForm');
-
-      await todoForm.props().handleAdd('New task', 'This is a new task');
-      const todoListComponent = wrapper.find("TodoList");
-      
-
-      expect(todoListComponent.props().todos.length).toBe(3);
-      expect(todoListComponent.props().todos).toEqual([
+  describe("#fetchingData", () => {
+    it("should get data from backend when it first rendered", async () => {
+      const data = [
         {
           id: 1,
           title: "Cooking",
-          description: "Cooking some food",
-        },
-        {
-          id: 2,
-          title: "Running",
-          description: "Running around my neighborhood",
-        },
-        {
-          id: 3,
-          title: "New task",
-          description: "This is a new task",
+          description: "Cooking some food"
         }
-      ]);
+      ]
+      
+      getTodos.mockResolvedValue({data : {data}});
+      let wrapper;
+      await act(async ()=> {
+        wrapper = await mount(<TodoPage />);  
+      });
+      await wrapper.update();
+      const todoListComponent = wrapper.find("TodoList");
+      const todos = todoListComponent.props().todos;
+     
+      expect(todos).toEqual(data);
+      jest.resetAllMocks();
+
+    });
+  });
+
+  describe('#handleAdd', () => {
+    it('should call post todo function with the correct params', async () => {
+      const wrapper = mount(<TodoPage />); 
+
+      const todoForm = wrapper.find('TodoForm');
+      await todoForm.props().handleAdd('New task', 'This is a new tasks');
+      await (new Promise(resolve => setTimeout(resolve, 0)));
+      await wrapper.update();
+         
+      const newObject = {
+        title : 'New task', 
+        description : 'This is a new tasks'
+      }
+      expect(postTodo).toHaveBeenCalledWith(newObject);     
     })
   })
 
-  describe("#handleDelete", () => {
-    it("should decrease todos length when handle delete is invoked", () => {
-      const wrapper = shallow(<TodoPage />);
+  describe('#handleEdit', () => {
+    it('should call the edit todo function with the correct params', async () => {
+      const editedTodo = {
+        title : 'New task', 
+        description : 'This is a new tasks'
+      }
+      const wrapper = mount(<TodoPage />); 
 
-      const todoListComponent = wrapper.find("TodoList");
-      todoListComponent.props().handleDelete(1);
+      const todoForm = wrapper.find('TodoForm');
+      await todoForm.props().handleEdit("98889asd", 'New task', 'This is a new tasks');
+      await (new Promise(resolve => setTimeout(resolve, 0)));
+      await wrapper.update();
+         
+      expect(editTodo).toHaveBeenCalledWith("98889asd", editedTodo);     
+    })
+  })
 
-      const newTodoListComponent = wrapper.find("TodoList");
+  // describe("#handleDelete", () => {
+  //   it("should decrease todos length when handle delete is invoked", () => {
+  //     const wrapper = shallow(<TodoPage />);
 
-      expect(newTodoListComponent.props().todos.length).toBe(1);
-      expect(newTodoListComponent.props().todos).toEqual([
-        {
-          id: 2,
-          title: "Running",
-          description: "Running around my neighborhood",
-        },
-      ]);
-    });
-  });
+  //     const todoListComponent = wrapper.find("TodoList");
+  //     todoListComponent.props().handleDelete(1);
+
+  //     const newTodoListComponent = wrapper.find("TodoList");
+
+  //     expect(newTodoListComponent.props().todos.length).toBe(1);
+  //     expect(newTodoListComponent.props().todos).toEqual([
+  //       {
+  //         id: 2,
+  //         title: "Running",
+  //         description: "Running around my neighborhood",
+  //       },
+  //     ]);
+  //   });
+    
+  // });
 });

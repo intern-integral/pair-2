@@ -27,4 +27,19 @@ describe("TodoList", () => {
       expect(handleDelete).toHaveBeenCalledWith(1);
     });
   });
+
+   describe("#handleEdit", () => {
+    it("should call setting todo edit when invoked", () => {
+      const setTodoEdit = jest.fn();
+      const handleDelete=  jest.fn();
+      const wrapper = shallow(
+        <TodoList todos={data} settingTodoEdit={setTodoEdit} handleDelete={handleDelete}/>
+      );
+
+      const button = wrapper.find(".btn-select").at(0);
+      button.simulate("click");
+
+      expect(settingTodoEdit).toHaveBeenCalledWith(data[0]);  
+    });
+  });
 });
