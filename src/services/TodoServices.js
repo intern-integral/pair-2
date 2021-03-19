@@ -4,8 +4,6 @@ const TODO_URL = "http://localhost:3030/api/todos/";
 
 export const getTodos = () => axios.get(TODO_URL);
 
-export const getTodo = (id) => axios.get(`${TODO_URL}/${id}`);
-
 export const postTodo = (value) =>
   axios.post(TODO_URL, value, {
     headers: {

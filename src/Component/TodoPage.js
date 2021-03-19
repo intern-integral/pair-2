@@ -7,15 +7,6 @@ const TodoPage = () => {
   const [todos, setTodos] = useState([]);
   const [isRefetch, setIsRefetch] = useState(true);
   const [todoEdit, setTodoEdit] = useState({});
-  
-  const handleDelete = async (id) => {
-    try {
-      await deleteTodo(id);
-      setIsRefetch(true)
-    } catch (error) {
-      console.log(error)
-    }
-  };
 
   const fetchingData = async () => {
     try {
@@ -32,6 +23,15 @@ const TodoPage = () => {
     }
   }, [isRefetch])
 
+  const handleDelete = async (id) => {
+      try {
+        await deleteTodo(id);
+        setIsRefetch(true)
+      } catch (error) {
+        console.log(error)
+      }
+  };
+  
   const handleAdd = async (title, description) => {
     const body = {
       title, description

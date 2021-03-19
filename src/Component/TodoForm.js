@@ -23,7 +23,7 @@ const TodoForm = ({ handleAdd, todoEdit, handleEdit }) => {
   }
   return (
     <>
-    <div className="">
+    <form>
       <label className="addLabel" htmlFor="">Input Todo : </label>
       <input
         className="addInput-title"
@@ -40,8 +40,8 @@ const TodoForm = ({ handleAdd, todoEdit, handleEdit }) => {
         onChange={(e) => setDescription(e.target.value)}
       />
       <button className="btn_add" onClick={() => addClick()}>Add</button>
-    </div>
-     <div className="">
+    </form>
+     <form >
       <label className="editLabel" htmlFor="">Edit Todo : </label>
       <input
         className="input-title-edit"
@@ -58,7 +58,7 @@ const TodoForm = ({ handleAdd, todoEdit, handleEdit }) => {
         onChange={(e) => setEditDescription(e.target.value)}
       />
       <button className="btn-edit" onClick={editClick}>Edit</button>
-    </div></>
+    </form></>
   );
 };
 
