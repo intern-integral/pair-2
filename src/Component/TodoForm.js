@@ -16,6 +16,11 @@ const TodoForm = ({ handleAdd, todoEdit, handleEdit }) => {
     setEditTitle("");
     setEditDescription("")
   }
+  const addClick = () => {
+    handleAdd(title, description);
+    setTitle("");
+    setDescription("")
+  }
   return (
     <>
     <div className="">
@@ -34,7 +39,7 @@ const TodoForm = ({ handleAdd, todoEdit, handleEdit }) => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-      <button className="btn_add" onClick={() => handleAdd(title, description)}>Add</button>
+      <button className="btn_add" onClick={() => addClick()}>Add</button>
     </div>
      <div className="">
       <label className="editLabel" htmlFor="">Edit Todo : </label>

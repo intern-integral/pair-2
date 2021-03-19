@@ -17,12 +17,12 @@ describe("TodoList", () => {
   describe("#handleDelete", () => {
     it("should delete a todo when the button is clicked", () => {
       const handleDelete = jest.fn();
-      const wrapper = shallow(
+      const wrapper = mount(
         <TodoList todos={data} handleDelete={handleDelete} />
       );
 
-      const btn = wrapper.find(".btn-delete").at(0);
-      btn.simulate("click");
+      const button = wrapper.find(".btn-delete").at(0);
+      button.simulate("click");
 
       expect(handleDelete).toHaveBeenCalledWith(1);
     });
@@ -39,7 +39,7 @@ describe("TodoList", () => {
       const button = wrapper.find(".btn-select").at(0);
       button.simulate("click");
 
-      expect(settingTodoEdit).toHaveBeenCalledWith(data[0]);  
+      expect(setTodoEdit).toHaveBeenCalledWith(data[0]);  
     });
   });
 });

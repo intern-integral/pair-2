@@ -1,10 +1,11 @@
-import {getTodos, postTodo, editTodo} from "../services/TodoServices";
+import {getTodos, postTodo, editTodo, deleteTodo} from "../services/TodoServices";
 import axios from 'axios' 
 
 jest.mock('axios', () =>({
   get : jest.fn(),
   post : jest.fn(),
-  patch : jest.fn()
+  patch : jest.fn(),
+  delete : jest.fn()
 }))
 
 const TODO_URL = "http://localhost:3030/api/todos/";
@@ -65,7 +66,7 @@ describe("TodoServices", () => {
   })
 
   describe('#editTodo', () => {
-    it('should call axios edit  when called with correct params', async () => {
+    it('should call axios edit when called with correct params', async () => {
       const id = "45234tgr3g2"
       const data = {
         title: "UpdatedTitle",
@@ -75,6 +76,16 @@ describe("TodoServices", () => {
       await editTodo(id, data)
 
       expect(axios.patch).toHaveBeenCalledWith(`${TODO_URL}/${id}`, data, header);
+    })
+  })
+
+  describe('#deleteTodo', () => {
+    it('should call axios delete when called with correct params', async () => {
+      const id ='9872349kjsdkfk'
+
+      await deleteTodo(id);
+
+      expect(axios.delete).toHaveBeenCalledWith(`${TODO_URL}/${id}`);
     })
   })
 })

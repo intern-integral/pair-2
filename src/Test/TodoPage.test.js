@@ -1,19 +1,20 @@
 import React from "react";
 import { mount, shallow } from "enzyme";
 import TodoPage from "../Component/TodoPage.js";
-import {getTodos, postTodo, editTodo} from "../services/TodoServices";
+import {getTodos, postTodo, editTodo, deleteTodo} from "../services/TodoServices";
 import { act } from 'react-dom/test-utils';
 jest.mock("axios");
 jest.mock("../services/TodoServices", () => ({
   getTodos: jest.fn(),
   postTodo : jest.fn(),
-  editTodo : jest.fn()
+  editTodo : jest.fn(),
+  deleteTodo : jest.fn()
 }));
 
-describe("TodoPages", () => {
+describe('TodoPages', () => {
   
-  describe("#render", () => {
-    it("should render a header, a Todolist component, and a TodoForm component", () => {
+  describe('#render', () => {
+    it('should render a header, a Todolist component, and a TodoForm component', () => {
       const wrapper = shallow(<TodoPage />);
 
       const todoPageHeader = wrapper.find("h1");
@@ -52,7 +53,25 @@ describe("TodoPages", () => {
   });
 
   describe('#handleAdd', () => {
+    it('should log an error when postTodo function fails', async () => {
+      postTodo.mockRejectedValue({})
+      global.console = {log: jest.fn()}
+      const wrapper = mount(<TodoPage />);
+
+      const todoForm = wrapper.find("TodoForm");
+      todoForm.props().handleAdd('', '');
+      await wrapper.update();
+
+      expect(console.log).toHaveBeenCalled();   
+      expect(console.log).toHaveBeenCalledTimes(1);     
+    })
     it('should call post todo function with the correct params', async () => {
+      postTodo.mockResolvedValue({
+        _id : "60542d489d0c0b109446e183",
+        title : "New task",
+        description : "This is a new tasks",
+        __v : 0
+      })
       const wrapper = mount(<TodoPage />); 
 
       const todoForm = wrapper.find('TodoForm');
@@ -74,10 +93,17 @@ describe("TodoPages", () => {
         title : 'New task', 
         description : 'This is a new tasks'
       }
+      const id = "98889asd"
+      editTodo.mockResolvedValue({
+        _id : id,
+        title : editedTodo.title ,
+        description : editedTodo.description,
+        __v : 0
+      })
       const wrapper = mount(<TodoPage />); 
 
       const todoForm = wrapper.find('TodoForm');
-      await todoForm.props().handleEdit("98889asd", 'New task', 'This is a new tasks');
+      await todoForm.props().handleEdit(id, editedTodo.title, editedTodo.description);
       await (new Promise(resolve => setTimeout(resolve, 0)));
       await wrapper.update();
          
@@ -85,24 +111,37 @@ describe("TodoPages", () => {
     })
   })
 
-  // describe("#handleDelete", () => {
-  //   it("should decrease todos length when handle delete is invoked", () => {
-  //     const wrapper = shallow(<TodoPage />);
+  describe("#handleDelete", () => {
+    it("should call delete todo function with the correct params", async () => {
+      const id = '9872349kjsdkfk';
+      deleteTodo.mockResolvedValue({
+        _id : id,
+        title : "New task",
+        description : "This is a new tasks",
+        __v : 0
+      })
+      const wrapper = mount(<TodoPage />);
 
-  //     const todoListComponent = wrapper.find("TodoList");
-  //     todoListComponent.props().handleDelete(1);
+      const todoListComponent = wrapper.find("TodoList");
+      todoListComponent.props().handleDelete(id);
+      await (new Promise(resolve => setTimeout(resolve, 0)));
+      await wrapper.update();
 
-  //     const newTodoListComponent = wrapper.find("TodoList");
+      expect(deleteTodo).toHaveBeenCalledWith(id);     
+   
+    });
 
-  //     expect(newTodoListComponent.props().todos.length).toBe(1);
-  //     expect(newTodoListComponent.props().todos).toEqual([
-  //       {
-  //         id: 2,
-  //         title: "Running",
-  //         description: "Running around my neighborhood",
-  //       },
-  //     ]);
-  //   });
-    
-  // });
+    it('should log an error when deleteTodo function fails', async () => {
+      deleteTodo.mockRejectedValue({})
+      global.console = {log: jest.fn()}
+      const wrapper = mount(<TodoPage />);
+
+      const todoListComponent = wrapper.find("TodoList");
+      todoListComponent.props().handleDelete(34543);
+      await wrapper.update();
+
+      expect(console.log).toHaveBeenCalled();   
+      expect(console.log).toHaveBeenCalledTimes(1);     
+    })
+  });
 });

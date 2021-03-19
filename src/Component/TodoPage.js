@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import TodoList from "./TodoList";
 import TodoForm from "./TodoForm";
-import {getTodos, postTodo, editTodo} from "../services/TodoServices"
+import {getTodos, postTodo, editTodo, deleteTodo} from "../services/TodoServices"
 
 const TodoPage = () => {
   const [todos, setTodos] = useState([]);
   const [isRefetch, setIsRefetch] = useState(true);
   const [todoEdit, setTodoEdit] = useState({});
   
-  const handleDelete = (deleteId) => {
-    const newTodos = todos.filter((todo) => todo.id !== deleteId);
-    setTodos(newTodos);
+  const handleDelete = async (id) => {
+    try {
+      await deleteTodo(id);
+      setIsRefetch(true)
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const fetchingData = async () => {
@@ -34,10 +38,10 @@ const TodoPage = () => {
     }
     try {
       await postTodo(body);
-      setIsRefetch(true);
     } catch (error) {
       console.log(error)
     }
+    setIsRefetch(true);
   } 
 
   const handleEdit = async (id, title, description) => {

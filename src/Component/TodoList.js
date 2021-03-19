@@ -10,7 +10,7 @@ const TodoList = ({ todos, handleDelete , settingTodoEdit}) => {
             <p>{todo.description}</p>
             <button
               className="btn-delete"
-              onClick={() => handleDelete(todo.id)}
+              onClick={() => handleDelete(todo._id)}
             >
               Delete
             </button>
